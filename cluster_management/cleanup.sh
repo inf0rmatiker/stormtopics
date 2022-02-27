@@ -12,22 +12,18 @@ function print_usage {
 [ ! -f "./nimbus" ]    && echo "No ./nimbus file found! Exiting" && exit 1
 [ ! -f "./zookeeper" ] && echo "No ./zookeeper file found! Exiting" && exit 1
 
-while read -r NODE; do
-  USERNAME=$(whoami)
+USERNAME=$(whoami)
+for NODE in $(cat nimbus); do
   echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
   ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
-done < "./workers"
-
-while read -r NODE; do
-  USERNAME=$(whoami)
+done
+for NODE in $(cat workers); do
   echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
   ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
-done < "./zookeeper"
-
-while read -r NODE; do
-  USERNAME=$(whoami)
+done
+for NODE in $(cat zookeeper); do
   echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
   ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
-done < "./nimbus"
+done
 
 echo "Done"
