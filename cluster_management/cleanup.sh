@@ -18,4 +18,16 @@ while read -r NODE; do
   ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
 done < "./workers"
 
+while read -r NODE; do
+  USERNAME=$(whoami)
+  echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
+  ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
+done < "./zookeeper"
+
+while read -r NODE; do
+  USERNAME=$(whoami)
+  echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
+  ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
+done < "./nimbus"
+
 echo "Done"
