@@ -3,6 +3,6 @@
 target/
 build/
 
-cluster_management/workers.example
+cluster_management/workers
 cluster_management/nimbus
 cluster_management/zookeeper
