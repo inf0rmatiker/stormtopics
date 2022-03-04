@@ -14,6 +14,14 @@ public class WordCountTopology {
     private static final String TOPOLOGY_NAME = "word-count-topology";
 
     public static void main(String[] args) {
+
+        boolean is_remote = false;
+        if (args.length > 1) {
+            if (args[1].equals("remote")) {
+                is_remote = true;
+            }
+        }
+
         RandomSentenceSpout spout = new RandomSentenceSpout();
         SplitSentence splitBolt = new SplitSentence();
         WordCount countBolt = new WordCount();
@@ -34,14 +42,17 @@ public class WordCountTopology {
 
         try {
 
-            config.setNumWorkers(2);
-            config.setMessageTimeoutSecs(60);
-            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
-//            LocalCluster cluster = new LocalCluster();
-//            cluster.submitTopology(TOPOLOGY_NAME, config, topology);
-            Thread.sleep(10000);
-            //cluster.killTopology(TOPOLOGY_NAME);
-            //cluster.shutdown();
+            if (is_remote) {
+                config.setNumWorkers(1);
+                config.setMessageTimeoutSecs(60);
+                StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
+            } else {
+                LocalCluster cluster = new LocalCluster();
+                cluster.submitTopology(TOPOLOGY_NAME, config, topology);
+                Thread.sleep(10000);
+                cluster.killTopology(TOPOLOGY_NAME);
+                cluster.shutdown();
+            }
         } catch (Exception e) {
             System.err.println("Caught Exception! " + e.getMessage());
         }
