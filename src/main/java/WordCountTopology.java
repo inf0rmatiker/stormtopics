@@ -1,5 +1,6 @@
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
@@ -32,11 +33,15 @@ public class WordCountTopology {
         Config config = new Config();
 
         try {
-            LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology(TOPOLOGY_NAME, config, topology);
+
+            config.setNumWorkers(2);
+            config.setMessageTimeoutSecs(60);
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
+//            LocalCluster cluster = new LocalCluster();
+//            cluster.submitTopology(TOPOLOGY_NAME, config, topology);
             Thread.sleep(10000);
-            cluster.killTopology(TOPOLOGY_NAME);
-            cluster.shutdown();
+            //cluster.killTopology(TOPOLOGY_NAME);
+            //cluster.shutdown();
         } catch (Exception e) {
             System.err.println("Caught Exception! " + e.getMessage());
         }
