@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
+group 'org.stormtopics'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -10,6 +10,10 @@ repositories {
 }
 
 dependencies {
+
+    // https://mvnrepository.com/artifact/org.apache.storm/storm-core
+    implementation group: 'org.apache.storm', name: 'storm-core', version: '2.3.0'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
