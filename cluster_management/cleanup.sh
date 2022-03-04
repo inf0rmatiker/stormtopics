@@ -15,15 +15,18 @@ function print_usage {
 USERNAME=$(whoami)
 for NODE in $(cat nimbus); do
   echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
-  ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
+  ssh "$NODE" "rm -rf /tmp/*"
 done
 for NODE in $(cat workers); do
   echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
-  ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
+  ssh "$NODE" "rm -rf /tmp/*"
 done
 for NODE in $(cat zookeeper); do
   echo "Cleaning $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
-  ssh -n "$NODE" "rm -rf /tmp/$USERNAME-storm"
+  ssh "$NODE" "rm -rf /tmp/*"
 done
+
+rm $STORM_HOME/logs/*.log
+rm $ZOOKEEPER_HOME/logs/*.out $ZOOKEEPER_HOME/logs/*.log
 
 echo "Done"

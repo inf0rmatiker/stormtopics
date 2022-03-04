@@ -22,9 +22,12 @@ sleep 2
 echo -e "Starting Nimbus on local machine ($(hostname))"
 supervisord -c $STORM_HOME/nimbus-supervisord.conf
 
+sleep 5
+
 while read -r WORKER; do
   echo "Starting worker on $WORKER"
   ssh -n "$WORKER" "supervisord -c $STORM_HOME/worker-supervisord.conf"
+  sleep 5
 done < "./workers"
 
 echo "Done"
