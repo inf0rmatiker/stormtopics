@@ -13,7 +13,16 @@ public class WordCountTopology {
     private static final String REPORT_BOLT_ID = "report-bolt";
     private static final String TOPOLOGY_NAME = "word-count-topology";
 
+    public static void printArgs(String[] args) {
+        StringBuilder sb = new StringBuilder("Args:");
+        for (int i = 0; i < args.length; i++) {
+            sb.append(String.format("arg[%d]=%s ", i, args[i]));
+        }
+        System.out.println(sb.toString());
+    }
+
     public static void main(String[] args) {
+        printArgs(args);
         System.out.println("Running main()");
         boolean is_remote = false;
         if (args.length > 1) {
