@@ -53,6 +53,7 @@ public class WordCountTopology {
                 cluster.killTopology(TOPOLOGY_NAME);
                 cluster.shutdown();
             }
+
         } catch (Exception e) {
             System.err.println("Caught Exception! " + e.getMessage());
         }
