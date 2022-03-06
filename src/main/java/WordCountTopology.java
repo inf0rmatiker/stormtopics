@@ -53,11 +53,11 @@ public class WordCountTopology {
 
             if (is_remote) {
                 System.out.println("is_remote=True");
+                config.setDebug(true);
                 config.setMaxTaskParallelism(1);
                 config.setNumWorkers(4);
                 config.setMessageTimeoutSecs(60);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
-                Thread.sleep(100000);
             }
 //            else {
 //                LocalCluster cluster = new LocalCluster();
