@@ -32,6 +32,7 @@ public class RandomSentenceSpout extends BaseRichSpout {
 
     @Override
     public void nextTuple() {
+        System.out.println("Emitting sentence " + sentences[index]);
         this.collector.emit(new Values(this.sentences[this.index]));
         this.index++;
         if (this.index >= this.sentences.length) {
