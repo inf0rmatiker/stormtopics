@@ -38,7 +38,7 @@ public class RandomSentenceSpout extends BaseRichSpout {
             this.index = 0;
         }
 
-        Utils.sleep(1);
+        Utils.sleep(1000);
     }
 
 }

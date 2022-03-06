@@ -29,7 +29,7 @@ public class ReportBolt extends BaseRichBolt {
 
     @Override
     public void cleanup() {
-        System.out.println("------------ FINAL COUNTS ---------------");
+        System.err.println("------------ FINAL COUNTS ---------------");
         List<String> keys = new ArrayList<>();
         keys.addAll(this.counts.keySet());
         Collections.sort(keys);
