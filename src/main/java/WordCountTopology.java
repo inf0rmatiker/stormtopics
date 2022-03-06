@@ -14,7 +14,7 @@ public class WordCountTopology {
     private static final String TOPOLOGY_NAME = "word-count-topology";
 
     public static void main(String[] args) {
-
+        System.out.println("Running main()");
         boolean is_remote = false;
         if (args.length > 1) {
             if (args[1].equals("remote")) {
@@ -39,13 +39,15 @@ public class WordCountTopology {
         StormTopology topology = builder.createTopology();
 
         Config config = new Config();
-
+        System.out.println("Got here");
         try {
 
             if (is_remote) {
+                System.out.println("is_remote=True");
                 config.setNumWorkers(1);
                 config.setMessageTimeoutSecs(60);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
+                Thread.sleep(10000);
 //            } else {
 //                LocalCluster cluster = new LocalCluster();
 //                cluster.submitTopology(TOPOLOGY_NAME, config, topology);
