@@ -1,5 +1,5 @@
 import org.apache.storm.Config;
-// import org.apache.storm.LocalCluster;
+//import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
@@ -18,7 +18,7 @@ public class WordCountTopology {
         for (int i = 0; i < args.length; i++) {
             sb.append(String.format("arg[%d]=%s ", i, args[i]));
         }
-        System.out.println(sb.toString());
+        System.out.println(sb);
     }
 
     public static void main(String[] args) {
@@ -53,17 +53,18 @@ public class WordCountTopology {
 
             if (is_remote) {
                 System.out.println("is_remote=True");
-                config.setNumWorkers(1);
+                config.setNumWorkers(4);
                 config.setMessageTimeoutSecs(60);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
                 Thread.sleep(10000);
-//            } else {
+            }
+//            else {
 //                LocalCluster cluster = new LocalCluster();
 //                cluster.submitTopology(TOPOLOGY_NAME, config, topology);
 //                Thread.sleep(10000);
 //                cluster.killTopology(TOPOLOGY_NAME);
 //                cluster.shutdown();
-            }
+//            }
 
         } catch (Exception e) {
             System.err.println("Caught Exception! " + e.getMessage());
