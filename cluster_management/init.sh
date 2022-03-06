@@ -23,7 +23,7 @@ for NODE in $(cat workers); do
 done
 for NODE in $(cat zookeeper); do
   echo "Creating $USERNAME's Storm directory on $NODE:/tmp/$USERNAME-storm"
-  ssh -n "$NODE" "mkdir /tmp/$USERNAME-storm"
+  ssh -n "$NODE" "mkdir -p /tmp/$USERNAME-storm /tmp/zookeeper_$USERNAME/data"
 done
 
 echo "Done"
