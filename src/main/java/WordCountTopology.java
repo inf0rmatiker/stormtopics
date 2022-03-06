@@ -25,8 +25,8 @@ public class WordCountTopology {
         printArgs(args);
         System.out.println("Running main()");
         boolean is_remote = false;
-        if (args.length > 1) {
-            if (args[1].equals("remote")) {
+        if (args.length == 1) {
+            if (args[0].equals("remote")) {
                 is_remote = true;
             }
         }
