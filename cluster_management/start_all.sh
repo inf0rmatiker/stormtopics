@@ -26,7 +26,7 @@ sleep 5
 
 while read -r WORKER; do
   echo "Starting worker on $WORKER"
-  ssh -n "$WORKER" "supervisord -c $STORM_HOME/worker-supervisord.conf"
+  ssh -n "$WORKER" "source ~/.zshrc && supervisord -c $STORM_HOME/worker-supervisord.conf"
   sleep 5
 done < "./workers"
 
