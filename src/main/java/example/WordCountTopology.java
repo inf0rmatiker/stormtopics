@@ -62,7 +62,7 @@ public class WordCountTopology {
                 config.setDebug(true);
                 config.setMaxTaskParallelism(1);
                 config.setNumWorkers(4);
-                config.setMessageTimeoutSecs(60);
+                config.setMessageTimeoutSecs(12);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
             }
 //            else {
