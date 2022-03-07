@@ -26,7 +26,7 @@ for NODE in $(cat zookeeper); do
   ssh "$NODE" "rm -rf /tmp/*"
 done
 
-rm $STORM_HOME/logs/*.log
-rm $ZOOKEEPER_HOME/logs/*.out $ZOOKEEPER_HOME/logs/*.log
+rm -rf $STORM_HOME/logs/*.log $STORM_HOME/logs/worker-artifacts/*
+rm $ZOOKEEPER_HOME/logs/*.out $ZOOKEEPER_HOME/logs/*.log 
 
 echo "Done"
