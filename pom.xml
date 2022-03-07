@@ -61,7 +61,7 @@
 <!--                            <transformers>-->
 <!--                                &lt;!&ndash; add Main-Class to manifest file &ndash;&gt;-->
 <!--                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
-<!--                                    <mainClass>WordCountTopology</mainClass>-->
+<!--                                    <mainClass>example.WordCountTopology</mainClass>-->
 <!--                                </transformer>-->
 <!--                            </transformers>-->
 <!--                        </configuration>-->

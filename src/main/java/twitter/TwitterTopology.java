@@ -1,11 +1,16 @@
+package twitter;
+
+import example.RandomSentenceSpout;
+import example.ReportBolt;
+import example.SplitSentence;
+import example.WordCount;
 import org.apache.storm.Config;
-//import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
 
-public class WordCountTopology {
+public class TwitterTopology {
 
     private static final String SENTENCE_SPOUT_ID = "sentence-spout";
     private static final String SPLIT_BOLT_ID = "split-bolt";
@@ -43,7 +48,7 @@ public class WordCountTopology {
         builder.setBolt(SPLIT_BOLT_ID, splitBolt).shuffleGrouping(SENTENCE_SPOUT_ID);
         builder.setBolt(COUNT_BOLT_ID, countBolt).fieldsGrouping(SPLIT_BOLT_ID, new Fields("word"));
 
-        // WordCountBolt --> ReportBolt
+        // WordCountBolt --> example.ReportBolt
         builder.setBolt(REPORT_BOLT_ID, reportBolt).globalGrouping(COUNT_BOLT_ID);
         StormTopology topology = builder.createTopology();
 

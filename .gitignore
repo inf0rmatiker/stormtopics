@@ -6,3 +6,5 @@ build/
 cluster_management/workers
 cluster_management/nimbus
 cluster_management/zookeeper
+
+env.sh

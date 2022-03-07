@@ -1,3 +1,5 @@
+package example;
+
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -6,34 +8,29 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class WordCount extends BaseRichBolt {
+public class SplitSentence extends BaseRichBolt {
 
     private OutputCollector collector;
-    private HashMap<String, Integer> counts = null;
 
     @Override
     public void prepare(Map<String, Object> config, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
-        this.counts = new HashMap<>();
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("word", "count"));
+        declarer.declare(new Fields("word"));
     }
 
     @Override
     public void execute(Tuple input) {
-        String word = input.getStringByField("word");
-        Integer count = this.counts.get(word);
-        if (count == null) {
-            count = 0;
+        String sentence = input.getStringByField("sentence");
+        String[] words = sentence.split(" ");
+        for (String word: words) {
+            this.collector.emit(new Values(word));
         }
-        count++;
-        this.counts.put(word, count);
-        this.collector.emit(new Values(word, count));
     }
+
 }
