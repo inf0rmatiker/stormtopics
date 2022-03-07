@@ -22,7 +22,6 @@ public class TwitterSpout extends BaseRichSpout {
     private static final String ACCESS_TOKEN = System.getenv("TWITTER_ACCESS_TOKEN");
     private static final String ACCESS_TOKEN_SECRET = System.getenv("TWITTER_ACCESS_TOKEN_SECRET");
 
-
     private TwitterStream twitterStream;
     private SpoutOutputCollector collector;
     private StatusListener statusListener;
@@ -70,6 +69,8 @@ public class TwitterSpout extends BaseRichSpout {
                 .setOAuthAccessTokenSecret(ACCESS_TOKEN_SECRET);
 
         this.twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+        this.twitterStream.addListener(this.statusListener);
+        this.twitterStream.sample();
     }
 
     @Override
