@@ -55,7 +55,7 @@ public class WordCountTopology {
                 System.out.println("is_remote=True");
                 config.setDebug(true);
                 config.setMaxTaskParallelism(1);
-                config.setNumWorkers(4);
+                config.setNumWorkers(1);
                 config.setMessageTimeoutSecs(60);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
             }
