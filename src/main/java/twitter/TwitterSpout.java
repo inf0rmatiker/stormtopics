@@ -88,7 +88,7 @@ public class TwitterSpout extends BaseRichSpout {
 
         this.twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
         this.twitterStream.addListener(this.statusListener);
-        this.twitterStream.filter(new FilterQuery().language(""));
+        this.twitterStream.filter(new FilterQuery().language("en"));
         this.twitterStream.sample();
     }
 
