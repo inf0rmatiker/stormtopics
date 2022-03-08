@@ -13,12 +13,11 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterTopology {
 
-
-    private static final String SENTENCE_SPOUT_ID = "sentence-spout";
+    private static final String TWITTER_SPOUT_ID = "twitter-spout";
     private static final String SPLIT_BOLT_ID = "split-bolt";
     private static final String COUNT_BOLT_ID = "count-bolt";
     private static final String REPORT_BOLT_ID = "report-bolt";
-    private static final String TOPOLOGY_NAME = "word-count-topology";
+    private static final String TOPOLOGY_NAME = "twitter-topology";
 
     public static void printArgs(String[] args) {
         StringBuilder sb = new StringBuilder("Args:");
@@ -39,7 +38,26 @@ public class TwitterTopology {
             }
         }
 
+        TwitterSpout twitterSpout = new TwitterSpout();
+        TopologyBuilder builder = new TopologyBuilder();
+        builder.setSpout(TWITTER_SPOUT_ID, twitterSpout);
+        StormTopology topology = builder.createTopology();
 
+        Config config = new Config();
+
+        try {
+
+            if (is_remote) {
+                System.out.println("is_remote=True");
+                config.setDebug(true);
+                config.setMaxTaskParallelism(1);
+                config.setNumWorkers(4);
+                config.setMessageTimeoutSecs(12);
+                StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
+            }
+        } catch (Exception e) {
+            System.err.println("Caught Exception! " + e.getMessage());
+        }
     }
 
 }
