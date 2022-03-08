@@ -47,11 +47,18 @@ public class TwitterTopology {
         TwitterReportBolt twitterReportBolt = new TwitterReportBolt();
 
         TopologyBuilder builder = new TopologyBuilder();
+
         builder.setSpout(TWITTER_SPOUT_ID, twitterSpout);
-        builder.setBolt(TWITTER_COUNT_BOLT_ID, twitterCountBolt)
+
+        // parallelismHint = How many executors (threads) to spawn per component.
+        builder.setBolt(TWITTER_COUNT_BOLT_ID, twitterCountBolt, 4)
+                .setNumTasks(8) // How many tasks to create per component. Gets run by an executor thread.
                 .fieldsGrouping(TWITTER_SPOUT_ID, new Fields("window_timestamp", "hashtag"));
-        builder.setBolt(TWITTER_REPORT_BOLT_ID, twitterReportBolt)
-                .fieldsGrouping(TWITTER_COUNT_BOLT_ID, new Fields("window_timestamp", "hashtag", "count", "error"));
+
+        // parallelismHint = How many executors (threads) to spawn per component.
+        builder.setBolt(TWITTER_REPORT_BOLT_ID, twitterReportBolt, 4)
+                .setNumTasks(8) // How many tasks to create per component. Gets run by an executor thread.
+                .globalGrouping(TWITTER_COUNT_BOLT_ID);
 
         StormTopology topology = builder.createTopology();
         Config config = new Config();
@@ -61,11 +68,17 @@ public class TwitterTopology {
             if (is_remote) {
                 System.out.println("is_remote=True");
                 config.setDebug(true);
-                config.setMaxTaskParallelism(1);
-                config.setNumWorkers(1);
+
+                // Max number of threads allowed per JVM worker process
+                config.setMaxTaskParallelism(4);
+
+                // How many worker processes (JVMs) to create for the topology across machines in the cluster.
+                config.setNumWorkers(3);
+
                 config.setMessageTimeoutSecs(12);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
             }
+
         } catch (Exception e) {
             System.err.println("Caught Exception! " + e.getMessage());
         }
