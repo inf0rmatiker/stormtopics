@@ -12,6 +12,8 @@ import org.apache.storm.tuple.Values;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class TwitterCountBolt extends BaseRichBolt {
 
@@ -24,7 +26,7 @@ public class TwitterCountBolt extends BaseRichBolt {
     private OutputCollector collector;
     private int bucket = 1;
     private int totalCount = 0;
-    private Map<String, HashFrequency> hashFrequencies = new HashMap<>();
+    private ConcurrentMap<String, HashFrequency> hashFrequencies = new ConcurrentHashMap<>();
 
     @Override
     public void prepare(Map<String, Object> config, TopologyContext context, OutputCollector collector) {
