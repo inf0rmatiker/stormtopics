@@ -58,7 +58,7 @@ public class TwitterTopology {
         // parallelismHint = How many executors (threads) to spawn per component.
         builder.setBolt(TWITTER_REPORT_BOLT_ID, twitterReportBolt, 4)
                 .setNumTasks(8) // How many tasks to create per component. Gets run by an executor thread.
-                .globalGrouping(TWITTER_COUNT_BOLT_ID);
+                .fieldsGrouping(TWITTER_COUNT_BOLT_ID, new Fields("window_timestamp", "hashtag", "count", "error"));
 
         StormTopology topology = builder.createTopology();
         Config config = new Config();
