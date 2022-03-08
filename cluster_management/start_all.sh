@@ -24,9 +24,12 @@ supervisord -c $STORM_HOME/nimbus-supervisord.conf
 
 sleep 5
 
+
+[[ -f "~/.zshrc" ]] && RC_FILE=".zshrc" || RC_FILE=".bashrc"
+
 while read -r WORKER; do
   echo "Starting worker on $WORKER"
-  ssh -n "$WORKER" "source ~/.zshrc && supervisord -c $STORM_HOME/worker-supervisord.conf"
+  ssh -n "$WORKER" "source ~/$RC_FILE && supervisord -c $STORM_HOME/worker-supervisord.conf"
   sleep 5
 done < "./workers"
 
