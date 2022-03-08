@@ -1,6 +1,6 @@
 package twitter;
 
-public class HashFrequency {
+public class HashFrequency implements Comparable<HashFrequency> {
 
     public String hashtag;
     public Integer estimatedFrequency;
@@ -24,5 +24,16 @@ public class HashFrequency {
     public String toString() {
         return String.format("{hashtag=%s, estimatedFrequency=%d, maxPossibleFreqError=%d}",
                 this.hashtag, this.estimatedFrequency, this.maxPossibleFreqError);
+    }
+
+    @Override
+    public int compareTo(HashFrequency other) {
+        if (this.estimatedFrequency > other.estimatedFrequency) {
+            return -1;
+        } else if (this.estimatedFrequency < other.estimatedFrequency) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

@@ -58,7 +58,9 @@ public class TwitterReportBolt extends BaseRichBolt {
         Collections.sort(windowKeys);
         for (Long windowKey: windowKeys) {
             List<HashFrequency> hashFrequenciesForWindow = this.allWindowResults.get(windowKey);
-            for (HashFrequency hashFrequency: hashFrequenciesForWindow) {
+            Collections.sort(hashFrequenciesForWindow);
+            for (int i = 0; i < 100 && i < hashFrequenciesForWindow.size(); i++) {
+                HashFrequency hashFrequency = hashFrequenciesForWindow.get(i);
                 log.info("window={}, hashFrequency={}", windowKey, hashFrequency.toString());
             }
         }
