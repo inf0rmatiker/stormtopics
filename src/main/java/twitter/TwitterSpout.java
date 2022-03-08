@@ -56,9 +56,6 @@ public class TwitterSpout extends BaseRichSpout {
                         if (isAscii) {
                             hashtagQueue.add(hashtagEntity.getText());
                             sb.append(String.format(" %s ", hashtagEntity.getText()));
-                        } else {
-                            hashtagQueue.add(hashtagEntity.getText());
-                            sb.append(String.format(" %s ", hashtagEntity.getText()));
                         }
                     }
                 }
