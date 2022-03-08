@@ -69,12 +69,15 @@ public class TwitterReportBolt extends BaseRichBolt {
 
         log.info("Received final count for hashtag={}", input.getStringByField("hashtag"));
 
-        this.currentWindowResults.add(new HashFrequency(
+        HashFrequency hashFrequency = new HashFrequency(
                 this.currentWindow,
                 input.getStringByField("hashtag"),
                 input.getIntegerByField("count"),
                 input.getIntegerByField("error")
-        ));
+        );
+
+        this.currentWindowResults.add(hashFrequency);
+        this.globalResults.offer(hashFrequency);
     }
 
     @Override

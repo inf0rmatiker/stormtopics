@@ -51,8 +51,8 @@ public class TwitterSpout extends BaseRichSpout {
 
             @Override
             public void onStatus(Status status) {
-                StringBuilder sb = new StringBuilder("[");
                 if (status.getHashtagEntities().length > 0) {
+                    StringBuilder sb = new StringBuilder("[");
                     HashtagEntity[] hashtagEntities = status.getHashtagEntities();
                     for (HashtagEntity hashtagEntity: hashtagEntities) {
                         boolean isAscii = hashtagEntity.getText().matches("\\A\\p{ASCII}*\\z");
@@ -61,9 +61,9 @@ public class TwitterSpout extends BaseRichSpout {
                             sb.append(String.format(" %s ", hashtagEntity.getText()));
                         }
                     }
+                    sb.append("]");
+                    log.info("Tweet with hashtags: {}", sb.toString());
                 }
-                sb.append("]");
-                log.info("Tweet with hashtags: {}", sb.toString());
             }
 
             @Override
