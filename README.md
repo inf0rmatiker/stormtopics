@@ -10,4 +10,21 @@ Project is written in Java, and uses Apache Storm for data processing and Zookee
 
 ## Usage
 
-TODO
+### Apache Storm Cluster Setup
+
+Cluster management scripts can be found in `cluster_management/`
+- Shutdown any existing supervisors, nimbus, and zookeeper: `./shutdown.sh`
+- Clean up any previous artifacts, log and pid files, etc: `./cleanup.sh`
+- Initialize log directories and data directories: `./init.sh`
+- Start Zookeeper, the Nimbus process, and any Worker processes remotely: `./start_all.sh`
+
+### Launching the Twitter Topology on the Cluster
+
+- `./submit.sh parallel` for parallel topology, or `./submit.sh linear` for linear topology.
+- Monitor the logs of the workers via `tail -f $STORM_HOME/logs/workers-artifacts/<topology_id>/<id>/worker.log`
+- Monitor the results logfile via `tail -f ~/results_<topology>.txt`
+
+### Killing the Twitter Topology Running on the Cluster
+
+- Use `./kill.sh`, this will wait for 12 seconds before killing the topology, and invoking the Bolts' `cleanup()` methods.
+

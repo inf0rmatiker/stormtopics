@@ -20,12 +20,17 @@ import java.util.PriorityQueue;
 
 public class TwitterReportBolt extends BaseRichBolt {
 
+    public TwitterReportBolt(String resultsFile) {
+        this.resultsFile = resultsFile;
+    }
+
     private static final Logger log = LogManager.getLogger(TwitterReportBolt.class.getSimpleName());
 
     private PriorityQueue<HashFrequency> globalResults;
     private List<HashFrequency> currentWindowResults;
     private FileWriter fileWriter;
     private Long currentWindow;
+    private String resultsFile;
 
     @Override
     public void prepare(Map<String, Object> config, TopologyContext context, OutputCollector collector) {
@@ -35,7 +40,7 @@ public class TwitterReportBolt extends BaseRichBolt {
 
         try {
 
-            File fileHandle = new File("/s/chopin/b/grad/cacaleb/results.txt");
+            File fileHandle = new File(this.resultsFile);
             if (fileHandle.createNewFile()) {
                 log.info("File created: {}", fileHandle.getName());
             } else {

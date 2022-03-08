@@ -41,6 +41,7 @@ public class TwitterTopology {
         int maxTaskParallelism = 1;
         int countBoltExecutors = 1;
         int countBoltTasks = 1;
+        String resultsFile = "~/results_linear_topology.txt";
 
         if (args.length == 1) {
             if (args[0].equals("parallel")) {
@@ -48,12 +49,13 @@ public class TwitterTopology {
                 maxTaskParallelism = 4;
                 countBoltExecutors = 4;
                 countBoltTasks = 8;
+                resultsFile = "~/results_parallel_topology.txt";
             }
         }
 
         TwitterSpout twitterSpout = new TwitterSpout();
         TwitterCountBolt twitterCountBolt = new TwitterCountBolt();
-        TwitterReportBolt twitterReportBolt = new TwitterReportBolt();
+        TwitterReportBolt twitterReportBolt = new TwitterReportBolt(resultsFile);
 
         TopologyBuilder builder = new TopologyBuilder();
 
