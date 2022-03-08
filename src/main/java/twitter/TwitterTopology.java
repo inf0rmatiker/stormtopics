@@ -36,21 +36,24 @@ public class TwitterTopology {
 
         log.info("Running main()...");
 
+        if (args.length != 2) {
+            log.error("Usage example: storm jar <path_to_jar> twitter.TwitterTopology parallel /s/chopin/g/cacaleb/results.txt");
+            log.error("Please supply <topology_type> and <results_file> as arguments");
+            System.exit(1);
+        }
+
         // Defaults for parallelism
         boolean isParallel = false;
         int maxTaskParallelism = 1;
         int countBoltExecutors = 1;
         int countBoltTasks = 1;
-        String resultsFile = "~/results_linear_topology.txt";
+        String resultsFile = args[1];
 
-        if (args.length == 1) {
-            if (args[0].equals("parallel")) {
-                isParallel = true;
-                maxTaskParallelism = 4;
-                countBoltExecutors = 4;
-                countBoltTasks = 8;
-                resultsFile = "~/results_parallel_topology.txt";
-            }
+        if (args[0].equals("parallel")) {
+            isParallel = true;
+            maxTaskParallelism = 4;
+            countBoltExecutors = 4;
+            countBoltTasks = 8;
         }
 
         TwitterSpout twitterSpout = new TwitterSpout();

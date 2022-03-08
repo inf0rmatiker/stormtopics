@@ -39,7 +39,6 @@ public class TwitterReportBolt extends BaseRichBolt {
         this.globalResults = new PriorityQueue<>();
 
         try {
-
             File fileHandle = new File(this.resultsFile);
             if (fileHandle.createNewFile()) {
                 log.info("File created: {}", fileHandle.getName());
