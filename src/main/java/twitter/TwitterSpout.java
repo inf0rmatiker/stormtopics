@@ -26,6 +26,9 @@ public class TwitterSpout extends BaseRichSpout {
     private static final String ACCESS_TOKEN = "1379146026523582464-4loRoAVBJ9WD7HTPFScmbrl7IOxvUh";
     private static final String ACCESS_TOKEN_SECRET = "tN9LeVbQ2YEF1c4q8Or8vbYcacNSoTiCVuFWM8MySecGH";
 
+    private static final short SECOND = 1000;
+    private static final int WINDOW_SECONDS = 10 * SECOND;
+
     private TwitterStream twitterStream;
     private SpoutOutputCollector collector;
     private StatusListener statusListener;
@@ -97,7 +100,13 @@ public class TwitterSpout extends BaseRichSpout {
 
     @Override
     public void nextTuple() {
-        if (!this.hashtagQueue.isEmpty()) {
+        // Check current time and update window if needed
+        if (System.currentTimeMillis() >= this.timestamp + WINDOW_SECONDS) {
+            moveToNextWindow();
+        }
+
+        // Emit all queued hashtags
+        while (!this.hashtagQueue.isEmpty()) {
             collector.emit(new Values(this.timestamp, hashtagQueue.poll()));
         }
     }
@@ -105,6 +114,11 @@ public class TwitterSpout extends BaseRichSpout {
     @Override
     public void close() {
         this.twitterStream.shutdown();
+    }
+
+    private synchronized void moveToNextWindow() {
+        this.timestamp += WINDOW_SECONDS;
+        log.info("Moved to next window, timestamp={}", this.timestamp);
     }
 
 }

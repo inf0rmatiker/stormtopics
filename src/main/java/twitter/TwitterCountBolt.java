@@ -27,8 +27,8 @@ public class TwitterCountBolt extends BaseRichBolt {
     private final double THRESHOLD = 0.002;
 
     private OutputCollector collector;
-    private int bucket;
-    private int totalCount;
+    private Integer bucket;
+    private Integer totalCount;
     private ConcurrentMap<String, HashFrequency> hashFrequencies;
     private Long windowTimestamp;
 
@@ -54,8 +54,16 @@ public class TwitterCountBolt extends BaseRichBolt {
 
         // Initialize windowTimestamp if not already done
         if (this.windowTimestamp == 0L) {
-            this.windowTimestamp = windowTimestamp;
+            setWindowTimestamp(windowTimestamp);
             log.info("Initialized windowTimestamp for the first time to {}", this.windowTimestamp);
+        } else if (!windowTimestamp.equals(this.windowTimestamp)) {
+            if (windowTimestamp > this.windowTimestamp) {
+                emitAllAndReset();
+                setWindowTimestamp(windowTimestamp);
+                log.info("Updated windowTimestamp to {}", this.windowTimestamp);
+            } else {
+                log.warn("Received tuple for previous window; discarding");
+            }
         }
 
         // Increment N on every incoming value
@@ -88,17 +96,26 @@ public class TwitterCountBolt extends BaseRichBolt {
     @Override
     public void cleanup() {
         log.info("cleanup() invoked, emitting final counts for windowTimestamp={}", this.windowTimestamp);
+        emitAllAndReset();
+    }
+
+    private void emitAllAndReset() {
+        log.info("Emitting all bucket values and resetting...");
         for (String hashtag: this.hashFrequencies.keySet()) {
             HashFrequency hashFrequency = this.hashFrequencies.get(hashtag);
             collector.emit(
                     new Values(
-                        this.windowTimestamp,
-                        hashtag,
-                        hashFrequency.estimatedFrequency,
-                        hashFrequency.maxPossibleFreqError
+                            this.windowTimestamp,
+                            hashtag,
+                            hashFrequency.estimatedFrequency,
+                            hashFrequency.maxPossibleFreqError
                     )
             );
         }
+
+        this.bucket = 1;
+        this.totalCount = 0;
+        this.hashFrequencies = new ConcurrentHashMap<>();
     }
 
     private void prune() {
@@ -114,6 +131,10 @@ public class TwitterCountBolt extends BaseRichBolt {
                         this.bucket);
             }
         }
+    }
+
+    private synchronized void setWindowTimestamp(Long windowTimestamp) {
+        this.windowTimestamp = windowTimestamp;
     }
 
     private boolean bucketIsFull() {

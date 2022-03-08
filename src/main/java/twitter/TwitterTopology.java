@@ -20,6 +20,7 @@ public class TwitterTopology {
 
     private static final String TWITTER_SPOUT_ID = "twitter-spout";
     private static final String TWITTER_COUNT_BOLT_ID = "twitter-count-bolt";
+    private static final String TWITTER_REPORT_BOLT_ID = "twitter-report-bolt";
     private static final String TOPOLOGY_NAME = "twitter-topology";
 
     public static void printArgs(String[] args) {
@@ -43,11 +44,14 @@ public class TwitterTopology {
 
         TwitterSpout twitterSpout = new TwitterSpout();
         TwitterCountBolt twitterCountBolt = new TwitterCountBolt();
+        TwitterReportBolt twitterReportBolt = new TwitterReportBolt();
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout(TWITTER_SPOUT_ID, twitterSpout);
         builder.setBolt(TWITTER_COUNT_BOLT_ID, twitterCountBolt)
                 .fieldsGrouping(TWITTER_SPOUT_ID, new Fields("window_timestamp", "hashtag"));
+        builder.setBolt(TWITTER_REPORT_BOLT_ID, twitterReportBolt)
+                .fieldsGrouping(TWITTER_COUNT_BOLT_ID, new Fields("window_timestamp", "hashtag", "count", "error"));
 
         StormTopology topology = builder.createTopology();
         Config config = new Config();
@@ -58,15 +62,13 @@ public class TwitterTopology {
                 System.out.println("is_remote=True");
                 config.setDebug(true);
                 config.setMaxTaskParallelism(1);
-                config.setNumWorkers(2);
+                config.setNumWorkers(1);
                 config.setMessageTimeoutSecs(12);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
             }
         } catch (Exception e) {
             System.err.println("Caught Exception! " + e.getMessage());
         }
-
-        Utils.sleep(10000); // Sleep for 10 sec
     }
 
 }
