@@ -10,7 +10,10 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -24,22 +27,36 @@ public class TwitterCountBolt extends BaseRichBolt {
     private final double THRESHOLD = 0.002;
 
     private OutputCollector collector;
-    private int bucket = 1;
-    private int totalCount = 0;
-    private ConcurrentMap<String, HashFrequency> hashFrequencies = new ConcurrentHashMap<>();
+    private int bucket;
+    private int totalCount;
+    private ConcurrentMap<String, HashFrequency> hashFrequencies;
+    private String windowTimestamp;
 
     @Override
     public void prepare(Map<String, Object> config, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
+        this.hashFrequencies = new ConcurrentHashMap<>();
+        this.windowTimestamp = "";
+        this.bucket = 1;
+        this.totalCount = 0;
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("hashtag", "count"));
+        declarer.declare(new Fields("window_timestamp", "hashtag", "count"));
     }
 
     @Override
     public void execute(Tuple input) {
+
+        String hashtagValue = input.getStringByField("hashtag");
+        String windowTimestamp = input.getStringByField("window_timestamp");
+
+        // Initialize windowTimestamp if not already done
+        if (this.windowTimestamp.equals("")) {
+            this.windowTimestamp = windowTimestamp;
+            log.info("Initialized windowTimestamp for the first time to {}", this.windowTimestamp);
+        }
 
         // Increment N on every incoming value
         this.totalCount++;
@@ -49,9 +66,6 @@ public class TwitterCountBolt extends BaseRichBolt {
             prune();
             this.bucket++;
         }
-
-        String hashtagValue = input.getStringByField("hashtag");
-
 
         if (this.hashFrequencies.containsKey(hashtagValue)) {
 
@@ -69,6 +83,11 @@ public class TwitterCountBolt extends BaseRichBolt {
             log.info("Added hashtag={} with frequency of 1", hashtagValue);
 
         }
+    }
+
+    @Override
+    public void cleanup() {
+        log.info("cleanup() invoked, emitting final counts for windowTimestamp={}", this.windowTimestamp);
     }
 
     private void prune() {
@@ -89,6 +108,7 @@ public class TwitterCountBolt extends BaseRichBolt {
     private boolean bucketIsFull() {
         return this.totalCount > 0 && this.totalCount % this.BUCKET_CAPACITY == 0;
     }
+
 
 
 }
