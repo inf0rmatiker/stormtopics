@@ -22,7 +22,7 @@ public class TwitterCountBolt extends BaseRichBolt {
 
     private static final Logger log = LogManager.getLogger(TwitterCountBolt.class.getSimpleName());
 
-    private final double EPSILON = 0.0002; // 1/0.0002 = 5,000 entries
+    private final double EPSILON = 0.002; // 1/0.0002 = 5,000 entries
     private final int BUCKET_CAPACITY = (int)(1.0/EPSILON);
     private final double THRESHOLD = 0.002;
 
