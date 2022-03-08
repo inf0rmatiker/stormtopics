@@ -43,7 +43,7 @@ public class TwitterCountBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("window_timestamp", "hashtag", "count"));
+        declarer.declare(new Fields("window_timestamp", "hashtag", "count", "error"));
     }
 
     @Override
@@ -88,6 +88,17 @@ public class TwitterCountBolt extends BaseRichBolt {
     @Override
     public void cleanup() {
         log.info("cleanup() invoked, emitting final counts for windowTimestamp={}", this.windowTimestamp);
+        for (String hashtag: this.hashFrequencies.keySet()) {
+            HashFrequency hashFrequency = this.hashFrequencies.get(hashtag);
+            collector.emit(
+                    new Values(
+                        this.windowTimestamp,
+                        hashtag,
+                        hashFrequency.estimatedFrequency,
+                        hashFrequency.maxPossibleFreqError
+                    )
+            );
+        }
     }
 
     private void prune() {
