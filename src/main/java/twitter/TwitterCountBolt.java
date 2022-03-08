@@ -22,7 +22,7 @@ public class TwitterCountBolt extends BaseRichBolt {
 
     private static final Logger log = LogManager.getLogger(TwitterCountBolt.class.getSimpleName());
 
-    private final double EPSILON = 0.002;
+    private final double EPSILON = 0.002; // 1/0.002 = 500 entries
     private final int BUCKET_CAPACITY = (int)(1.0/EPSILON);
     private final double THRESHOLD = 0.002;
 
@@ -30,13 +30,13 @@ public class TwitterCountBolt extends BaseRichBolt {
     private int bucket;
     private int totalCount;
     private ConcurrentMap<String, HashFrequency> hashFrequencies;
-    private String windowTimestamp;
+    private Long windowTimestamp;
 
     @Override
     public void prepare(Map<String, Object> config, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
         this.hashFrequencies = new ConcurrentHashMap<>();
-        this.windowTimestamp = "";
+        this.windowTimestamp = 0L;
         this.bucket = 1;
         this.totalCount = 0;
     }
@@ -50,10 +50,10 @@ public class TwitterCountBolt extends BaseRichBolt {
     public void execute(Tuple input) {
 
         String hashtagValue = input.getStringByField("hashtag");
-        String windowTimestamp = input.getStringByField("window_timestamp");
+        Long windowTimestamp = input.getLongByField("window_timestamp");
 
         // Initialize windowTimestamp if not already done
-        if (this.windowTimestamp.equals("")) {
+        if (this.windowTimestamp == 0L) {
             this.windowTimestamp = windowTimestamp;
             log.info("Initialized windowTimestamp for the first time to {}", this.windowTimestamp);
         }

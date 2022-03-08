@@ -30,7 +30,7 @@ public class TwitterSpout extends BaseRichSpout {
     private SpoutOutputCollector collector;
     private StatusListener statusListener;
     private LinkedBlockingQueue<String> hashtagQueue;
-    private Timestamp timestamp;
+    private Long timestamp;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -39,7 +39,7 @@ public class TwitterSpout extends BaseRichSpout {
 
     @Override
     public void open(Map<String, Object> config, TopologyContext context, SpoutOutputCollector collector) {
-        this.timestamp = new Timestamp(System.currentTimeMillis());
+        this.timestamp = System.currentTimeMillis();
         this.collector = collector;
         this.hashtagQueue = new LinkedBlockingQueue<>();
         log.info("open() called for timestamp={}", this.timestamp.toString());
@@ -101,7 +101,7 @@ public class TwitterSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         if (!this.hashtagQueue.isEmpty()) {
-            collector.emit(new Values(this.timestamp.toString(), hashtagQueue.poll()));
+            collector.emit(new Values(this.timestamp, hashtagQueue.poll()));
         }
     }
 
