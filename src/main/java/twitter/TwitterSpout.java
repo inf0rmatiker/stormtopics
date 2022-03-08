@@ -12,6 +12,7 @@ import org.apache.storm.tuple.Values;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -29,16 +30,20 @@ public class TwitterSpout extends BaseRichSpout {
     private SpoutOutputCollector collector;
     private StatusListener statusListener;
     private LinkedBlockingQueue<String> hashtagQueue;
+    private Timestamp timestamp;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("hashtag"));
+        declarer.declare(new Fields("window_timestamp", "hashtag"));
     }
 
     @Override
     public void open(Map<String, Object> config, TopologyContext context, SpoutOutputCollector collector) {
+        this.timestamp = new Timestamp(System.currentTimeMillis());
         this.collector = collector;
         this.hashtagQueue = new LinkedBlockingQueue<>();
+        log.info("open() called for timestamp={}", this.timestamp.toString());
+
         this.statusListener = new StatusListener() {
 
             @Override
@@ -96,7 +101,7 @@ public class TwitterSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         if (!this.hashtagQueue.isEmpty()) {
-            collector.emit(new Values(hashtagQueue.poll()));
+            collector.emit(new Values(this.timestamp.toString(), hashtagQueue.poll()));
         }
     }
 

@@ -11,6 +11,7 @@ import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
+import org.apache.storm.utils.Utils;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterTopology {
@@ -46,7 +47,7 @@ public class TwitterTopology {
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout(TWITTER_SPOUT_ID, twitterSpout);
         builder.setBolt(TWITTER_COUNT_BOLT_ID, twitterCountBolt)
-                .fieldsGrouping(TWITTER_SPOUT_ID, new Fields("hashtag"));
+                .fieldsGrouping(TWITTER_SPOUT_ID, new Fields("window_timestamp", "hashtag"));
 
         StormTopology topology = builder.createTopology();
         Config config = new Config();
@@ -64,6 +65,8 @@ public class TwitterTopology {
         } catch (Exception e) {
             System.err.println("Caught Exception! " + e.getMessage());
         }
+
+        Utils.sleep(10000); // Sleep for 10 sec
     }
 
 }
