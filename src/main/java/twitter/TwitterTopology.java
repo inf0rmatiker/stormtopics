@@ -18,9 +18,7 @@ public class TwitterTopology {
     private static final Logger log = LogManager.getLogger(TwitterTopology.class.getSimpleName());
 
     private static final String TWITTER_SPOUT_ID = "twitter-spout";
-    private static final String SPLIT_BOLT_ID = "split-bolt";
-    private static final String COUNT_BOLT_ID = "count-bolt";
-    private static final String REPORT_BOLT_ID = "report-bolt";
+    private static final String TWITTER_COUNT_BOLT_ID = "twitter-count-bolt";
     private static final String TOPOLOGY_NAME = "twitter-topology";
 
     public static void printArgs(String[] args) {
@@ -43,10 +41,14 @@ public class TwitterTopology {
         }
 
         TwitterSpout twitterSpout = new TwitterSpout();
+        TwitterCountBolt twitterCountBolt = new TwitterCountBolt();
+
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout(TWITTER_SPOUT_ID, twitterSpout);
-        StormTopology topology = builder.createTopology();
+        builder.setBolt(TWITTER_COUNT_BOLT_ID, twitterCountBolt)
+                .fieldsGrouping(TWITTER_SPOUT_ID, new Fields("hashtag"));
 
+        StormTopology topology = builder.createTopology();
         Config config = new Config();
 
         try {
@@ -55,7 +57,7 @@ public class TwitterTopology {
                 System.out.println("is_remote=True");
                 config.setDebug(true);
                 config.setMaxTaskParallelism(1);
-                config.setNumWorkers(1);
+                config.setNumWorkers(2);
                 config.setMessageTimeoutSecs(12);
                 StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
             }
