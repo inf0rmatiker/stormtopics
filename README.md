@@ -20,7 +20,7 @@ Cluster management scripts can be found in `cluster_management/`
 
 ### Launching the Twitter Topology on the Cluster
 
-- `./submit.sh parallel` for parallel topology, or `./submit.sh linear` for linear topology.
+- `./submit.sh parallel <path_to_results_file>` for parallel topology, or `./submit.sh linear <path_to_results_file>` for linear topology.
 - Monitor the logs of the workers via `tail -f $STORM_HOME/logs/workers-artifacts/<topology_id>/<id>/worker.log`
 - Monitor the results logfile via `tail -f ~/results_<topology>.txt`
 
