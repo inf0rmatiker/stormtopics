@@ -1,3 +1,3 @@
 #!/bin/bash
 
-storm kill word-count-topology
+storm kill twitter-topology
