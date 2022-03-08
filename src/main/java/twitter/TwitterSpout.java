@@ -16,11 +16,11 @@ import java.util.Map;
 
 public class TwitterSpout extends BaseRichSpout {
 
-    private static final String API_KEY = System.getenv("TWITTER_API_KEY");
-    private static final String API_KEY_SECRET = System.getenv("TWITTER_API_KEY_SECRET");
-    private static final String BEARER_TOKEN = System.getenv("TWITTER_BEARER_TOKEN");
-    private static final String ACCESS_TOKEN = System.getenv("TWITTER_ACCESS_TOKEN");
-    private static final String ACCESS_TOKEN_SECRET = System.getenv("TWITTER_ACCESS_TOKEN_SECRET");
+    private static final String API_KEY = "KpHRi90CRut4JE3ilESpfZsxd";
+    private static final String API_KEY_SECRET = "00pCIw58twUpHUwIk1UMuS0stY5NiIvnt1V3xrJAE6FBBKCpF7";
+    private static final String BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAGF5ZwEAAAAA5%2B1SSbC2OdOagBBVOdDxZXXQmDs%3DsKeljnM4RkPxvUSY4rNRhK5I3dVwKo8UT44WhE1evRbOKv6VOB";
+    private static final String ACCESS_TOKEN = "1379146026523582464-4loRoAVBJ9WD7HTPFScmbrl7IOxvUh";
+    private static final String ACCESS_TOKEN_SECRET = "tN9LeVbQ2YEF1c4q8Or8vbYcacNSoTiCVuFWM8MySecGH";
 
     private TwitterStream twitterStream;
     private SpoutOutputCollector collector;
@@ -34,7 +34,6 @@ public class TwitterSpout extends BaseRichSpout {
     @Override
     public void open(Map<String, Object> config, TopologyContext context, SpoutOutputCollector collector) {
         this.collector = collector;
-
         this.statusListener = new StatusListener() {
 
             @Override
