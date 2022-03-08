@@ -68,6 +68,7 @@ public class TwitterCountBolt extends BaseRichBolt {
 
         // Increment N on every incoming value
         this.totalCount++;
+        log.info("totalCount={}", this.totalCount);
 
         // If the bucket is full (N mod w == 0), prune D and move to next bucket number
         if (bucketIsFull()) {
@@ -88,7 +89,6 @@ public class TwitterCountBolt extends BaseRichBolt {
             this.hashFrequencies.put(hashtagValue, new HashFrequency(
                     this.windowTimestamp, hashtagValue, 1, this.bucket - 1
             ));
-            log.info("Added hashtag={} with frequency of 1", hashtagValue);
 
         }
     }
@@ -118,7 +118,7 @@ public class TwitterCountBolt extends BaseRichBolt {
         this.hashFrequencies = new ConcurrentHashMap<>();
     }
 
-    private void prune() {
+    private synchronized void prune() {
         log.info("Bucket {} is full ({} total items), pruning...", this.bucket, this.totalCount);
         for (String hashtag: this.hashFrequencies.keySet()) {
             HashFrequency hashFrequency = this.hashFrequencies.get(hashtag);
