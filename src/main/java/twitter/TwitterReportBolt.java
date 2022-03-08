@@ -16,11 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.io.File;
 import java.io.IOException;
+import java.util.PriorityQueue;
 
 public class TwitterReportBolt extends BaseRichBolt {
 
     private static final Logger log = LogManager.getLogger(TwitterReportBolt.class.getSimpleName());
 
+    private PriorityQueue<HashFrequency> globalResults;
     private List<HashFrequency> currentWindowResults;
     private FileWriter fileWriter;
     private Long currentWindow;
@@ -29,6 +31,7 @@ public class TwitterReportBolt extends BaseRichBolt {
     public void prepare(Map<String, Object> config, TopologyContext context, OutputCollector collector) {
         this.currentWindow = 0L;
         this.currentWindowResults = new ArrayList<>();
+        this.globalResults = new PriorityQueue<>();
 
         try {
 
@@ -64,9 +67,10 @@ public class TwitterReportBolt extends BaseRichBolt {
             resetWindowResultsForNewWindow(windowTimestamp);
         }
 
-        log.info("Received final count for window={}, hashtag={}", windowTimestamp, input.getStringByField("hashtag"));
+        log.info("Received final count for hashtag={}", input.getStringByField("hashtag"));
 
         this.currentWindowResults.add(new HashFrequency(
+                this.currentWindow,
                 input.getStringByField("hashtag"),
                 input.getIntegerByField("count"),
                 input.getIntegerByField("error")
@@ -76,6 +80,12 @@ public class TwitterReportBolt extends BaseRichBolt {
     @Override
     public void cleanup() {
         try {
+            this.fileWriter.write("\n ------- Global results of stream -------\n\n");
+            for (int i = 0; i < 100 && i < this.globalResults.size(); i++) {
+                HashFrequency nextTopHashtag = this.globalResults.poll();
+                this.fileWriter.write(String.format("hashFrequency=%s\n", nextTopHashtag));
+            }
+            this.fileWriter.write("\n ----------------------------------------\n");
             this.fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,14 +95,16 @@ public class TwitterReportBolt extends BaseRichBolt {
     private void writeWindowResultsToFile() {
         Collections.sort(this.currentWindowResults); // Sort by hashtag frequencies, descending
 
-        // Log top 100 hashtags for window
-        for (int i = 0; i < 100 && i < this.currentWindowResults.size(); i++) {
-            HashFrequency hashFrequency = this.currentWindowResults.get(i);
-            try {
-                this.fileWriter.write(String.format("window=%d, hashFrequency=%s\n", this.currentWindow, hashFrequency));
-            } catch (IOException e) {
-                log.error("Caught IOException when writing window results to file");
+        try {
+            // Log top 100 hashtags for window
+            this.fileWriter.write(String.format("\n> Results for window %d:\n\n", this.currentWindow));
+            for (int i = 0; i < 100 && i < this.currentWindowResults.size(); i++) {
+                HashFrequency hashFrequency = this.currentWindowResults.get(i);
+                this.fileWriter.write(String.format("hashFrequency=%s\n", hashFrequency));
             }
+            this.fileWriter.flush();
+        } catch (IOException e) {
+            log.error("Caught IOException when writing window results to file");
         }
     }
 

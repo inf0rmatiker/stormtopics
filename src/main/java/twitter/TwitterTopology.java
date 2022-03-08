@@ -28,17 +28,26 @@ public class TwitterTopology {
         for (int i = 0; i < args.length; i++) {
             sb.append(String.format("arg[%d]=%s ", i, args[i]));
         }
-        System.out.println(sb);
+        log.info(sb.toString());
     }
 
     public static void main(String[] args) {
         printArgs(args);
 
-        System.out.println("Running main()");
-        boolean is_remote = false;
+        log.info("Running main()...");
+
+        // Defaults for parallelism
+        boolean isParallel = false;
+        int maxTaskParallelism = 1;
+        int countBoltExecutors = 1;
+        int countBoltTasks = 1;
+
         if (args.length == 1) {
-            if (args[0].equals("remote")) {
-                is_remote = true;
+            if (args[0].equals("parallel")) {
+                isParallel = true;
+                maxTaskParallelism = 4;
+                countBoltExecutors = 4;
+                countBoltTasks = 8;
             }
         }
 
@@ -51,36 +60,31 @@ public class TwitterTopology {
         builder.setSpout(TWITTER_SPOUT_ID, twitterSpout);
 
         // parallelismHint = How many executors (threads) to spawn per component.
-        builder.setBolt(TWITTER_COUNT_BOLT_ID, twitterCountBolt, 4)
-                .setNumTasks(8) // How many tasks to create per component. Gets run by an executor thread.
+        builder.setBolt(TWITTER_COUNT_BOLT_ID, twitterCountBolt, countBoltExecutors)
+                .setNumTasks(countBoltTasks) // How many tasks to create per component. Gets run by an executor thread.
                 .fieldsGrouping(TWITTER_SPOUT_ID, new Fields("window_timestamp", "hashtag"));
 
         // parallelismHint = How many executors (threads) to spawn per component.
-        builder.setBolt(TWITTER_REPORT_BOLT_ID, twitterReportBolt, 4)
-                .setNumTasks(8) // How many tasks to create per component. Gets run by an executor thread.
+        builder.setBolt(TWITTER_REPORT_BOLT_ID, twitterReportBolt, 1)
+                .setNumTasks(1) // How many tasks to create per component. Gets run by an executor thread.
                 .fieldsGrouping(TWITTER_COUNT_BOLT_ID, new Fields("window_timestamp", "hashtag", "count", "error"));
 
         StormTopology topology = builder.createTopology();
         Config config = new Config();
 
         try {
+            config.setDebug(true);
 
-            if (is_remote) {
-                System.out.println("is_remote=True");
-                config.setDebug(true);
+            // Max number of threads allowed per JVM worker process
+            config.setMaxTaskParallelism(maxTaskParallelism);
 
-                // Max number of threads allowed per JVM worker process
-                config.setMaxTaskParallelism(4);
+            // How many worker processes (JVMs) to create for the topology across machines in the cluster.
+            config.setNumWorkers(3);
 
-                // How many worker processes (JVMs) to create for the topology across machines in the cluster.
-                config.setNumWorkers(3);
-
-                config.setMessageTimeoutSecs(12);
-                StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
-            }
-
+            config.setMessageTimeoutSecs(12);
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
         } catch (Exception e) {
-            System.err.println("Caught Exception! " + e.getMessage());
+            log.error("Caught Exception! " + e.getMessage());
         }
     }
 

@@ -2,11 +2,13 @@ package twitter;
 
 public class HashFrequency implements Comparable<HashFrequency> {
 
+    public Long windowTimestamp;
     public String hashtag;
     public Integer estimatedFrequency;
     public Integer maxPossibleFreqError;
 
-    public HashFrequency(String hashtag, Integer estimatedFrequency, Integer maxPossibleFreqError) {
+    public HashFrequency(Long windowTimestamp, String hashtag, Integer estimatedFrequency, Integer maxPossibleFreqError) {
+        this.windowTimestamp = windowTimestamp;
         this.hashtag = hashtag;
         this.estimatedFrequency = estimatedFrequency;
         this.maxPossibleFreqError = maxPossibleFreqError;
@@ -22,8 +24,8 @@ public class HashFrequency implements Comparable<HashFrequency> {
 
     @Override
     public String toString() {
-        return String.format("{hashtag=%s, estimatedFrequency=%d, maxPossibleFreqError=%d}",
-                this.hashtag, this.estimatedFrequency, this.maxPossibleFreqError);
+        return String.format("{window=%d, hashtag=%s, estimatedFrequency=%d, maxPossibleFreqError=%d}",
+                this.windowTimestamp, this.hashtag, this.estimatedFrequency, this.maxPossibleFreqError);
     }
 
     @Override

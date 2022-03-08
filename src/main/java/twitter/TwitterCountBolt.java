@@ -86,7 +86,7 @@ public class TwitterCountBolt extends BaseRichBolt {
 
             // Seeing this hashtag for the first time; create a new entry
             this.hashFrequencies.put(hashtagValue, new HashFrequency(
-                    hashtagValue, 1, this.bucket - 1
+                    this.windowTimestamp, hashtagValue, 1, this.bucket - 1
             ));
             log.info("Added hashtag={} with frequency of 1", hashtagValue);
 
@@ -140,7 +140,5 @@ public class TwitterCountBolt extends BaseRichBolt {
     private boolean bucketIsFull() {
         return this.totalCount > 0 && this.totalCount % this.BUCKET_CAPACITY == 0;
     }
-
-
 
 }
