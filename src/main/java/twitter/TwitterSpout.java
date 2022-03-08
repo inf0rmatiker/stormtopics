@@ -28,7 +28,7 @@ public class TwitterSpout extends BaseRichSpout {
     private TwitterStream twitterStream;
     private SpoutOutputCollector collector;
     private StatusListener statusListener;
-    private LinkedBlockingQueue<HashtagEntity[]> hashtagQueue;
+    private LinkedBlockingQueue<String> hashtagQueue;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -43,15 +43,21 @@ public class TwitterSpout extends BaseRichSpout {
 
             @Override
             public void onStatus(Status status) {
+                StringBuilder sb = new StringBuilder("[");
                 if (status.getHashtagEntities().length > 0) {
-                    hashtagQueue.add(status.getHashtagEntities());
-                    StringBuilder sb = new StringBuilder("[");
-                    for (HashtagEntity hashtag: status.getHashtagEntities()) {
-                        sb.append(String.format(" %s ", hashtag.getText()));
+                    if (status.getLang().equals("en")) {
+                        HashtagEntity[] hashtagEntities = status.getHashtagEntities();
+                        for (HashtagEntity hashtagEntity: hashtagEntities) {
+                            boolean isAscii = hashtagEntity.getText().matches("\\A\\p{ASCII}*\\z");
+                            if (isAscii) {
+                                hashtagQueue.add(hashtagEntity.getText());
+                                sb.append(String.format(" %s ", hashtagEntity.getText()));
+                            }
+                        }
                     }
-                    sb.append("]");
-                    log.info("Tweet with hashtags: {}", sb.toString());
                 }
+                sb.append("]");
+                log.info("Tweet with hashtags: {}", sb.toString());
             }
 
             @Override
@@ -82,17 +88,14 @@ public class TwitterSpout extends BaseRichSpout {
 
         this.twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
         this.twitterStream.addListener(this.statusListener);
-        this.twitterStream.filter(new FilterQuery().language("en"));
+        this.twitterStream.filter(new FilterQuery().language(""));
         this.twitterStream.sample();
     }
 
     @Override
     public void nextTuple() {
         if (!this.hashtagQueue.isEmpty()) {
-            HashtagEntity[] hashtags = this.hashtagQueue.poll();
-            for (HashtagEntity hashtag: hashtags) {
-                collector.emit(new Values(hashtag.getText()));
-            }
+            collector.emit(new Values(hashtagQueue.poll()));
         }
     }
 
