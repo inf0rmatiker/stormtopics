@@ -4,6 +4,8 @@ import example.RandomSentenceSpout;
 import example.ReportBolt;
 import example.SplitSentence;
 import example.WordCount;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
@@ -12,6 +14,8 @@ import org.apache.storm.tuple.Fields;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterTopology {
+
+    private static final Logger log = LogManager.getLogger(TwitterTopology.class.getSimpleName());
 
     private static final String TWITTER_SPOUT_ID = "twitter-spout";
     private static final String SPLIT_BOLT_ID = "split-bolt";
