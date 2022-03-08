@@ -29,7 +29,7 @@ sleep 5
 
 while read -r WORKER; do
   echo "Starting worker on $WORKER"
-  ssh -n "$WORKER" "source ~/$RC_FILE && supervisord -c $STORM_HOME/worker-supervisord.conf"
+  ssh -n "$WORKER" "source ~/.bashrc && supervisord -c $STORM_HOME/worker-supervisord.conf"
   sleep 5
 done < "./workers"
 

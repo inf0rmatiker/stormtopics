@@ -17,11 +17,11 @@ USERNAME=$(whoami)
 echo -e "Shutting down Storm Workers..."
 while read -r WORKER; do
   echo "Shutting down worker on $WORKER"
-  ssh -n "$WORKER" "WORKER_PID=\$(cat /tmp/$USERNAME-storm/supervisord.pid) && echo \"Found worker process \$WORKER_PID\" && kill \$WORKER_PID || echo \"Didn't find any workers!\""
+  ssh -n "$WORKER" "WORKER_PID=\$(ps -aux | grep \"[s]upervisord\" | awk '{ print \$2 }') && echo \"Found worker process \$WORKER_PID\" && kill \$WORKER_PID || echo \"Didn't find any workers!\""
 done < "./workers"
 
 echo -e "Shutting down Storm Nimbus on local machine ($(hostname))"
-NIMBUS_PID=$(cat /tmp/$USERNAME-storm/supervisord.pid)
+NIMBUS_PID=$(ps -aux | grep "[s]upervisord" | awk '{ print $2 }')
 [ "$NIMBUS_PID" != "" ] && echo "Found Nimbus process $NIMBUS_PID" && kill $NIMBUS_PID || echo "Didn't find any Nimbus instance!"
 
 ZOOKEEPER_HOST=$(cat zookeeper)
