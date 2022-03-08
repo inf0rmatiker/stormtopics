@@ -27,7 +27,7 @@ public class TwitterSpout extends BaseRichSpout {
     private static final String ACCESS_TOKEN_SECRET = "tN9LeVbQ2YEF1c4q8Or8vbYcacNSoTiCVuFWM8MySecGH";
 
     private static final short SECOND = 1000;
-    private static final int WINDOW_SECONDS = 10 * SECOND;
+    private static final int WINDOW_SECONDS = 30 * SECOND;
 
     private TwitterStream twitterStream;
     private SpoutOutputCollector collector;
